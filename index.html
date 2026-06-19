@@ -184,7 +184,16 @@ Após o decreto:
 - CTA de inscrição final com sino.
 - FRASE DE ENCERRAMENTO OBRIGATÓRIA (sempre igual):
 "Questa è la nostra preghiera di stanotte. E come dico sempre: San Michele cammina davanti a te — anche quando non lo senti. A domani."`,
-                revisionChecklist: `CRITÉRIO 1 — CTA DE INSCRIÇÃO NO INÍCIO (CRÍTICO — MÁXIMA PRIORIDADE):
+                revisionChecklist: `CRITÉRIO 0 — TESTEMUNHOS DUPLICADOS (verificar PRIMEIRO, antes de qualquer outro critério):
+Leia TODO o roteiro e liste todos os nomes próprios de personagens/testemunhos que aparecem.
+Se o mesmo nome aparecer mais de uma vez em contextos diferentes (ex: "Carmela" no bloco de validação E no bloco de desenvolvimento), mantenha APENAS a ocorrência mais desenvolvida e narrativamente rica.
+Substitua a ocorrência duplicada por:
+a) Uma referência genérica: "nella preghiera, ho incontrato molte persone con questo stesso peso..."
+OU
+b) Um novo testemunho com nome, cidade, profissão e situação completamente diferentes.
+NUNCA deixe o mesmo nome em dois blocos distintos do roteiro.
+
+CRITÉRIO 1 — CTA DE INSCRIÇÃO NO INÍCIO (CRÍTICO — MÁXIMA PRIORIDADE):
 Verifique se existe, nos primeiros 60 segundos do roteiro, o CTA de inscrição:
 "Prima di andare avanti, ho bisogno di chiederti una cosa. Se sei arrivato su questo canale per la prima volta — iscriviti adesso e attiva la campanella. Qui pubblico ogni giorno uno spazio sacro che nessuna fretta del mondo può darti. Un clic. E adesso torniamo insieme in questa preghiera."
 Se AUSENTE: INSERIR OBRIGATORIAMENTE após o gancho inicial, antes de qualquer desenvolvimento do tema.
@@ -415,6 +424,16 @@ Escreva APENAS o texto deste bloco:`
             }
 
             if (partNum === 2) {
+                const textoAnteriorCompleto = previousText ? previousText.slice(-3500) : '';
+                const nomesEncontrados = new Set();
+                const regexNomes = /\b([A-ZÀÈÌÒÙ][a-zàèìòùéáíóú]+)(?:,\s*\d+\s*anni)?\b/g;
+                let matchNome;
+                const excluirNomes = ['San','Michele','Dio','Gesù','Cristo','Arcangelo','Signore','Padre','Maria','Scrittura','Parola','Salmo','Proverbi','Daniele','Genesi','Michea','Romani','Luca','Marco','Matteo','Giovanni','Pietro','Paolo','Giacobbe','Giuseppe','Amen','Prima','Lascia','Scrivi','Metti','Leggo','Grazie','Ogni','Questa','Stanotte','Adesso','Ed','Non','Se','Come','Poi','Ma'];
+                while ((matchNome = regexNomes.exec(textoAnteriorCompleto)) !== null) {
+                    const nome = matchNome[1];
+                    if (nome.length > 3 && !excluirNomes.includes(nome)) nomesEncontrados.add(nome);
+                }
+                const nomesUsadosStr = nomesEncontrados.size > 0 ? [...nomesEncontrados].slice(0, 10).join(', ') : 'nenhum ainda';
                 return {
                     system: `Você é um roteirista sênior de YouTube e ghostwriter de elite.\n${SYSTEM_RULES}\n\n${langBlock}\n\n[MAPA DE DNA DO CANAL]\n${channelDNA || 'Tom devocional íntimo, baseado na Escritura, com testemunhos reais.'}\n\n${personaBlock}`,
                     user: `[TÍTULO DO VÍDEO]: "${scriptData.title}"
@@ -422,15 +441,21 @@ Escreva APENAS o texto deste bloco:`
 [FONTES DE PESQUISA]:
 ${scriptData.sources}
 
-[CONTINUAÇÃO — ÚLTIMAS LINHAS DO BLOCO ANTERIOR]:
-...${previousText ? previousText.slice(-1800) : ''}
+[CONTEÚDO COMPLETO DO BLOCO ANTERIOR — LEIA COM ATENÇÃO ANTES DE ESCREVER]:
+${textoAnteriorCompleto}
+
+[⚠️ NOMES JÁ USADOS NO BLOCO ANTERIOR — PROIBIDO REUTILIZAR]:
+${nomesUsadosStr}
+Se qualquer um desses nomes já apareceu acima, NÃO o use neste bloco.
+Crie novos testemunhos com nomes, cidades e situações de vida completamente diferentes.
 
 [TAREFA — ${channelType.block2Label.toUpperCase()}]:
 ${channelType.block2Instruction}
 
 PROIBIÇÕES:
 - Não invente dados ou histórias além do que as fontes permitem.
-- Perfis dos testemunhos devem ser DIFERENTES entre si.
+- Perfis dos testemunhos devem ser DIFERENTES entre si E dos já apresentados no bloco anterior.
+- NUNCA reutilize um nome já mencionado anteriormente.
 - Meta: ~${wordTarget} palavras. NÃO escreva o nome deste bloco no texto.
 
 Escreva APENAS o texto deste bloco:`
@@ -445,8 +470,8 @@ Escreva APENAS o texto deste bloco:`
 [FONTES DE PESQUISA]:
 ${scriptData.sources}
 
-[CONTINUAÇÃO — ÚLTIMAS LINHAS DO BLOCO ANTERIOR]:
-...${previousText ? previousText.slice(-1800) : ''}
+[CONTEÚDO DOS BLOCOS ANTERIORES — LEIA ANTES DE ESCREVER]:
+${previousText ? previousText.slice(-3500) : ''}
 
 [TAREFA — ${channelType.block3Label.toUpperCase()}]:
 ${channelType.block3Instruction}
@@ -468,8 +493,8 @@ Escreva APENAS o texto deste bloco:`
 [FONTES DE PESQUISA]:
 ${scriptData.sources}
 
-[CONTINUAÇÃO — ÚLTIMAS LINHAS DO BLOCO ANTERIOR]:
-...${previousText ? previousText.slice(-1800) : ''}
+[CONTEÚDO DOS BLOCOS ANTERIORES — LEIA ANTES DE ESCREVER]:
+${previousText ? previousText.slice(-3500) : ''}
 
 [TAREFA — FECHAMENTO EMOCIONAL + CTA + ENCERRAMENTO]:
 Este é o último bloco do corpo do vídeo.
